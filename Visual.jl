@@ -1,33 +1,39 @@
-function DrawPlot(Deq::DEquation; t::Int)
-    if t > Deq.T+1
+function DrawPlot(Sol::DSolution; t::Int, fn::Function=(x, t)->0)
+    if t > Sol.T+1
         error("Time out of range!")
     end
-    x = range(0, Deq.N*Deq.dx, Deq.N+1)
+    x = range(0, Sol.N*Sol.dx, Sol.N+1)
+    τ = fill((t-1)*Sol.dt, Sol.N+1)
 
-    plot(x, Deq.SolMat[t, :])
+    plot(x, Sol.SolMat[t, :])
+    plot!(x, map(fn, x, τ))
 end;
 
-function DrawPlotAnim(Deq::DEquation; FPS::Int=10, step::Int=1)
-    x = range(0, Deq.N*Deq.dx, Deq.N+1)
-    anim = @animate for t = 1:step:Deq.T+1 
-        plot(x, Deq.SolMat[t, :], title=string(round(t*Deq.dt; digits=3)), legend=false)
+function DrawPlotAnim(Sol::DSolution; FPS::Int=10, step::Int=1, fn::Function=(x, t)->0, folder::AbstractString="output")
+    x = range(0, Sol.N*Sol.dx, Sol.N+1)
+    anim = @animate for t = 1:step:Sol.T+1
+        τ = fill((t-1)*Sol.dt, Sol.N+1)
+        plot(x, Sol.SolMat[t, :], title="t = "*string(round(t*Sol.dt; digits=3)), legend=false)
+        plot!(x, map(fn, x, τ))
     end
 
-    gif(anim, "TempWavePlot.gif", fps=FPS)
+    path = joinpath(folder, "TempWavePlot.gif")
+    gif(anim, path, fps=FPS)
 end;
 
-function DrawHeatmap(Deq::DEquation; t::Int)
-    data = Deq.SolMat[t, :]
+function DrawHeatmap(Sol::DSolution; t::Int)
+    data = Sol.SolMat[t, :]
 
     heatmap([data;; data]')
 end;
 
-function DrawHeatmapAnim(Deq::DEquation; FPS::Int=10, step::Int=1)
-    x = range(0, Deq.N*Deq.dx, Deq.N+1)
-    anim = @animate for t = 1:step:Deq.T+1 
-        data = Deq.SolMat[t, :]
-        heatmap([data;; data]', title=string(round(t*Deq.dt; digits=3)))
+function DrawHeatmapAnim(Sol::DSolution; FPS::Int=10, step::Int=1, folder::AbstractString="output")
+    # x = range(0, Sol.N*Sol.dx, Sol.N+1)
+    anim = @animate for t = 1:step:Sol.T+1 
+        data = Sol.SolMat[t, :]
+        heatmap([data;; data]', title="t = "*string(round(t*Sol.dt; digits=3)))
     end
 
-    gif(anim, "TempWaveMap.gif", fps=FPS)
+    path = joinpath(folder, "TempWaveMap.gif")
+    gif(anim, path, fps=FPS)
 end;
