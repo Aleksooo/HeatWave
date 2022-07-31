@@ -9,7 +9,7 @@ function DrawPlot(Sol::DSolution; t::Int, fn::Function=(x, t)->0)
     plot!(x, map(fn, x, τ))
 end;
 
-function DrawPlotAnim(Sol::DSolution; FPS::Int=10, step::Int=1, fn::Function=(x, t)->0, folder::AbstractString="output")
+function DrawPlotAnim(Sol::DSolution; FPS::Int=10, step::Int=10, fn::Function=(x, t)->0, folder::AbstractString="output")
     x = range(0, Sol.N*Sol.dx, Sol.N+1)
     anim = @animate for t = 1:step:Sol.T+1
         τ = fill((t-1)*Sol.dt, Sol.N+1)
@@ -18,6 +18,10 @@ function DrawPlotAnim(Sol::DSolution; FPS::Int=10, step::Int=1, fn::Function=(x,
     end
 
     path = joinpath(folder, "TempWavePlot.gif")
+    if !isfile(path)
+        mkpath(folder)
+    end
+            
     gif(anim, path, fps=FPS)
 end;
 
@@ -27,7 +31,7 @@ function DrawHeatmap(Sol::DSolution; t::Int)
     heatmap([data;; data]')
 end;
 
-function DrawHeatmapAnim(Sol::DSolution; FPS::Int=10, step::Int=1, folder::AbstractString="output")
+function DrawHeatmapAnim(Sol::DSolution; FPS::Int=10, step::Int=10, folder::AbstractString="output")
     # x = range(0, Sol.N*Sol.dx, Sol.N+1)
     anim = @animate for t = 1:step:Sol.T+1 
         data = Sol.SolMat[t, :]
@@ -35,5 +39,9 @@ function DrawHeatmapAnim(Sol::DSolution; FPS::Int=10, step::Int=1, folder::Abstr
     end
 
     path = joinpath(folder, "TempWaveMap.gif")
+    if !isfile(path)
+        mkpath(folder)
+    end
+            
     gif(anim, path, fps=FPS)
 end;
