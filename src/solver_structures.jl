@@ -7,9 +7,9 @@ abstract type AbstractSolver end
 
 
 """
-    ImplicitSolver{T} <: Solver
+    ImplicitSolver{T} <: AbstractSolver
 
-Solver implementation for implicit finite difference schemes
+Solver implementation for implicit finite-difference schemes
 
 # Fields
 - `space_grid::Vector{T}`: vector with nodes of space grid
@@ -17,8 +17,8 @@ Solver implementation for implicit finite difference schemes
     on the current time layer
 - `u_prev::Vector{T}`: vector with values of function u in the space grid nodes
     on the previous time layer
-- `matrix::Tridiagonal{T}`: matrix of a system of linear equations to find values of u
-    in current time layer
+- `matrix::Tridiagonal{T}`: tridiagonal matrix of a system of linear equations
+    to find values of u on the current time layer
 """
 struct ImplicitSolver{T} <: AbstractSolver
     N::Int

@@ -1,13 +1,10 @@
-#= module HeatWave
+module HeatWave
 
 export HeatWaveProblem
 export ImplicitSolver
 export solve!
-# export read_log, read_solution
-export draw_frame
-export test
-=#
-println("Load")
+export draw_frame, draw_series
+export frame_2, frame_0_5, series_2, series_0_5
 
 using LinearAlgebra
 using DelimitedFiles
@@ -18,7 +15,6 @@ include("solver_structures.jl")
 include("io.jl")
 include("solver.jl")
 include("visual.jl")
-include("../example/test1.jl")
+include("../example/examples.jl")
 
-#end # module
-# include("src/HeatWave.jl"); using .HeatWave; include("example/test1.jl"); test()
+end # module

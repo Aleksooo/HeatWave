@@ -6,7 +6,7 @@ that has a form:
 
     ∂u/∂t = ∂(k*∂u/∂x)/∂x,
 
-where x∈[0, 1], t∈[0, finish_time]
+where x∈[0, 1]; t∈[0, finish_time]
 
 # Fields
 - `kappa::T`: coefficient in the formula of thermal conductivity
