@@ -63,3 +63,30 @@ struct HeatWaveProblem{T}
         )
     end
 end
+
+"""
+    create_u_target(problem::HeatWaveProblem)
+
+Function obtained as a result of the analyticalsolution
+
+# Arguments
+- `x`: coordinate
+- `t`: time
+
+# Keywords
+- `problem::HeatWaveProblem`: problem to get the coefficients for the function
+
+# Returns
+- `Function`: return function function in point (x, t)
+"""
+function create_u_target(problem::HeatWaveProblem)
+    wavespeed = sqrt(problem.kappa * problem.u0^problem.σ / problem.σ)
+
+    return function (x, t)
+        if 0 <= x <= wavespeed * t
+            return problem.u0 * (t - x / wavespeed)^(1 / problem.σ)
+        else
+            return 0
+        end
+    end
+end

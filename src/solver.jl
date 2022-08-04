@@ -11,7 +11,7 @@ function init!(solver::ImplicitSolver, problem::HeatWaveProblem)
 end
 
 """
-    eval_coeff!(solver::ImplicitSolver, problem::HeatWaveProblem; dt)
+    calc_coeff!(solver::ImplicitSolver, problem::HeatWaveProblem; dt)
 
 Calculate the coefficient matrix in a recurrent formula for an implicit finite-difference
 scheme for all spatial nodes on a particular time layer using the formula:
@@ -27,7 +27,7 @@ where aᵢ and aᵢ₊₁ are values of function `problem.k` which are calculate
 - aᵢ = (k(uʲᵢ₋₁) + k(uʲᵢ)) / 2
 - aᵢ₊₁ = (k(uʲᵢ) + k(uʲᵢ₊₁)) / 2
 """
-function eval_coeff!(solver::ImplicitSolver, problem::HeatWaveProblem; dt)
+function calc_coeff!(solver::ImplicitSolver, problem::HeatWaveProblem; dt)
     N = solver.N
     dx = solver.dx
     k = problem.k
@@ -64,7 +64,7 @@ function step!(solver::AbstractSolver, problem::HeatWaveProblem; iter::Int, dt)
     solver.u_prev[begin] = problem.u_left(time)
     solver.u_prev[end] = problem.u_right(time)
 
-    eval_coeff!(solver, problem; dt=dt)
+    calc_coeff!(solver, problem; dt=dt)
     solver.u_curr .= solver.matrix \ solver.u_prev
 
     return nothing
@@ -97,14 +97,7 @@ function solve!(
     time_grid = range(0, problem.finish_time; length=M)
     dt = step(time_grid)
 
-    write_log(;
-        x_left=problem.x_left,
-        x_right=problem.x_right,
-        N=solver.N,
-        finish_time=problem.finish_time,
-        M=M,
-        folder=folder
-    )
+    write_log(problem, solver; M=M, folder=folder)
 
     println("Evaluating...")
     init!(solver, problem)

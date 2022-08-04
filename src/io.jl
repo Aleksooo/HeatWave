@@ -22,17 +22,23 @@ function write_solution!(solver::AbstractSolver; iter::Int, folder::AbstractStri
     return nothing
 end
 
-function write_log(; x_left::T, x_right::T, N::Int, finish_time::T, M::Int, folder::AbstractString="output") where {T}
+function write_log(
+    problem::HeatWaveProblem, solver::AbstractSolver;
+    M::Int, folder::AbstractString="output"
+)
     log = joinpath(folder, "log.txt")
     log_file = open(log, "w")
 
+    dt = problem.finish_time / (M -1)
     str = join([
-        x_left,
-        x_right,
-        N,
+        problem.x_left,
+        problem.x_right,
+        solver.N,
+        solver.dx
     ], '\t')*'\n'*join([
-        finish_time,
+        problem.finish_time,
         M,
+        dt,
     ], '\t')*'\n'
 
     write(log_file, str)
@@ -52,7 +58,7 @@ function read_solution(; folder::AbstractString="output")
     data_matrix = readdlm(data; comments=true)
 
     return data_matrix
-end;
+end
 
 function read_log(; folder::AbstractString="output")
     log = joinpath(folder, "log.txt")
@@ -64,16 +70,18 @@ function read_log(; folder::AbstractString="output")
     log_matrix = readdlm(log)
 
     return ConvertConfig(log_matrix)
-end;
+end
 
 function ConvertConfig(log_matrix::Matrix)
-    x_left, x_right, N, finish_time, M = log_matrix'
+    x_left, x_right, N, dx, finish_time, M, dt = log_matrix'
 
     return (
         x_left=x_left,
         x_right=x_right,
         N=trunc(Int, N),
+        dx=dx,
         finish_time=finish_time,
-        M=trunc(Int, M)
+        M=trunc(Int, M),
+        dt=dt,
     )
-end;
+end

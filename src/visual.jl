@@ -1,8 +1,8 @@
-function gen_lb(t::Int)
+function create_label(t::Int)
     return "t = "*string(t)
 end
 
-function gen_lb(series::Vector{Int})
+function create_label(series::Vector{Int})
     return ["t = "*string(t) for t in series]
 end
 
@@ -11,7 +11,6 @@ end
         t::Int;
         folder::AbstractString="output",
         is_save::Bool=false,
-        seriestype::Symbol=:scatter,
         lw::Real=1.5
     )
 
@@ -23,9 +22,9 @@ Visual function `u` on the `t` time layer. Get data from `folder`. Save to `fold
 # Keywords
 - `folder::AbstractString="output"`: folder with data to plot
 - `is_save::Bool=false`: flag for saving plot picture (to the `folder`)
-- `seriestype::Symbol=:scatter`: symbol for data visualisation
-    (make sence only with `:scatter` and `:line`)
-- `lw::Real=1.5`: width of symbols
+- `lw::Real=1.0`: width of the line plot
+- `sw::Real=0.5`: width of the scatter plot
+- `fn::Union{Function, Nothing}=nothing`: function of analytical solution
 
 # Throws
 - `Time out of range!`: if number `t` is greater than total number of time layers
@@ -37,8 +36,9 @@ function draw_frame(
     t::Int;
     folder::AbstractString="output",
     is_save::Bool=false,
-    seriestype::Symbol=:scatter,
-    lw::Real=1.5
+    lw::Real=1.0,
+    sw::Real=0.5,
+    fn::Union{Function, Nothing}=nothing,
 )
     log = read_log(; folder=folder)
     data = read_solution(; folder=folder)
@@ -48,16 +48,22 @@ function draw_frame(
     end
 
     x = range(log.x_left, log.x_right; length=log.N)
-    println("Drawing plot")
+    time = (t - 1) * log.dt
 
-    pl = plot(
+    println("Drawing plot")
+    pl = plot(xlabel="x", ylabel="u(x)")
+
+    if !(fn == nothing)
+        y = [fn(i, time) for i in x]
+        plot!(x, y, label="u(x, "*string(t)*")", lw=lw)
+    end
+
+    plot!(
         x,
         data[t, :],
-        label=gen_lb(t),
-        xlabel="x",
-        ylabel="u(x)",
-        seriestype=seriestype,
-        lw=lw,
+        label=create_label(t),
+        seriestype=:scatter,
+        lw=sw,
     )
 
     display(pl)
@@ -97,11 +103,12 @@ Visual function `u` on the time layers from `series`. Get data from `folder`.
 - `nothing`: return in case of successful ploting
 """
 function draw_series(
-    series::Vector{Int};
+    series::Union{AbstractVector{Int}, AbstractRange{Int}};
     folder::AbstractString="output",
     is_save::Bool=false,
-    seriestype::Symbol=:scatter,
-    lw::Real=1.5,
+    lw::Real=1.0,
+    sw::Real=0.5,
+    fn::Union{Function, Nothing}=nothing,
 )
     log = read_log(; folder=folder)
     data = read_solution(; folder=folder)
@@ -113,19 +120,19 @@ function draw_series(
     end
 
     x = range(log.x_left, log.x_right; length=log.N)
+
     println("Drawing plot")
+    pl = plot(xlabel="x", ylabel="u(x)")
 
-    pl = plot(
-        x,
-        data[series[begin], :],
-        label=gen_lb(series[begin]),
-        xlabel="x", ylabel="u(x)",
-        seriestype=seriestype,
-        lw=lw,
-    )
+    for t in series
+        time = (t - 1) * log.dt
 
-    for t in series[2:end]
-        plot!(x, data[t, :], label=gen_lb(t), seriestype=seriestype, lw=lw)
+        if !(fn == nothing)
+            y = [fn(i, time) for i in x]
+            plot!(x, y, label="u(x, "*string(t)*")", lw=lw)
+        end
+
+        plot!(x, data[t, :], label=create_label(t), seriestype=:scatter, lw=sw)
     end
 
     display(pl)
