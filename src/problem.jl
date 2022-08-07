@@ -1,24 +1,22 @@
 """
-    HeatWaveProblem{T}
+    HeatWaveProblem([; kappa=1.0, σ=2.0, u0=1.0, x_left=0.0, x_right=1.0])
 
 Problem of spreading heat wave. It is described using a differential equation
-that has a form:
+that has a form
 
-    ∂u/∂t = ∂(k*∂u/∂x)/∂x,
+    ∂u/∂t = ∂(k*∂u/∂x)/∂x; x ∈ [x_left, x_right], t ∈ [0, finish_time],
 
-where x∈[0, 1]; t∈[0, finish_time]
+where k =  k(u) = `kappa` * u^`σ`, finish_time = (x_right - x_left) / wavespeed,
+    wavespeed = sqrt(`kappa` * `u0`^`σ` / `σ`)
 
-# Fields
-- `kappa::T`: coefficient in the formula of thermal conductivity
-- `σ::T`: coefficient which state in the power in the formula of thermal conductivity
-- `u0::T`: coefficient in the formula of init condition
+with initial condition
 
-- `finish_time::T`: calculation time of our problem
+    u(x, 0) = 0
 
-- `u_init::Function`: function of init condition u(0, t) = u0 * t^(1/σ)
-- `u_left::Function`: function of left boundary condition u(x, 0) = 0
-- `u_right::Function`: function of left boundary condition u(1, 0) = 0
-- `k::Function`: function of coefficient of thermal conductivity k(u) = kappa * u^σ
+and boundary conditions
+
+    u(x_left, t) = u0 * t^(1/σ)
+    u(x_right, t) = 0
 """
 struct HeatWaveProblem{T}
     kappa::T
@@ -35,12 +33,12 @@ struct HeatWaveProblem{T}
     k::Function
 
     function HeatWaveProblem(;
-        kappa::T=1.0,
-        σ::T=2.0,
-        u0::T=1.0,
-        x_left::T=0.0,
-        x_right::T=1.0
-    ) where {T}
+        kappa::Real=1,
+        σ::Real=0.5,
+        u0::Real=1,
+        x_left::Real=0,
+        x_right::Real=1,
+    )
         wavespeed = sqrt(kappa * u0^σ / σ)
         finish_time = (x_right - x_left) / wavespeed
 
@@ -49,17 +47,19 @@ struct HeatWaveProblem{T}
         u_right = t -> 0
         k = u -> kappa * u^σ
 
-        return new{T}(
-            kappa,
-            σ,
-            u0,
-            x_left,
-            x_right,
+        return new{Float64}(
+            float.((
+                kappa,
+                σ,
+                u0,
+                x_left,
+                x_right,
+            ))...,
             finish_time,
             u_init,
             u_left,
             u_right,
-            k
+            k,
         )
     end
 end
