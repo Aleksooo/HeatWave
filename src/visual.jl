@@ -49,7 +49,7 @@ function draw_frame(
     x = range(config.x_left, config.x_right; length=config.N)
     time = (t - 1) * config.dt
 
-    println("Drawing plot")
+    @info "Drawing plot..."
     pl = plot(xlabel="x", ylabel="u(x)")
 
     if !(fn == nothing)
@@ -118,7 +118,7 @@ function draw_series(
 
     x = range(config.x_left, config.x_right; length=config.N)
 
-    println("Drawing plot")
+    @info "Drawing plot..."
     pl = plot(xlabel="x", ylabel="u(x)")
 
     for t in series

@@ -39,7 +39,8 @@ function solve!(
 
     write_config(problem, solver; M=M, io=io)
 
-    println(stderr, "Evaluating...")
+    # println(stderr, "Evaluating...")
+    @info "Evaluating..."
     init!(solver, problem)
     write_solution(solver; iter=1, io=io)
 
@@ -48,6 +49,7 @@ function solve!(
         write_solution(solver; iter=j, io=io)
     end
 
-    println(stderr, "Success!")
+    # println(stderr, "Success!")
+    @info "Success!"
     return nothing
 end
