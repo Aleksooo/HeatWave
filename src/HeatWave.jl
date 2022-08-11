@@ -2,7 +2,7 @@ module HeatWave
 
 export HeatWaveProblem
 export ImplicitSolver
-export create_u_target
+export actual_u
 export solve!
 export draw_frame, draw_series
 

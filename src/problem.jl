@@ -65,7 +65,7 @@ struct HeatWaveProblem{T}
 end
 
 """
-    create_u_target(problem::HeatWaveProblem)
+    actual_u(problem::HeatWaveProblem)
 
 Function obtained as a result of the analytical solution
 
@@ -77,7 +77,7 @@ Function obtained as a result of the analytical solution
 
 - `Function`: returns function from two variables x and t
 """
-function create_u_target(problem::HeatWaveProblem)
+function actual_u(problem::HeatWaveProblem)
     wavespeed = sqrt(problem.kappa * problem.u0^problem.σ / problem.σ)
 
     return function (x, t)
