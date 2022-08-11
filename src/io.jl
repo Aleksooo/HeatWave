@@ -64,7 +64,6 @@ function read_data(io::IO)
         end
 
         if config_flag
-            # println(line)
             k, v = split(line, delim_config)
             push!(key, Symbol(k))
             push!(value, parse_num(v))
@@ -81,44 +80,6 @@ function read_data(io::IO)
     matrix = convert_vector(solution_vector)
 
     return config, matrix
-end
-
-function read_config(io::IO)
-    config_vector = Vector(undef, 7)
-    count = 1
-
-    while count < 7
-        line = readline(io)
-        if line[1] != "#"
-            println(line)
-            config_vector[count] = split(line, ": ")[2]
-            count += 1
-        end
-    end
-
-    return Config(config_vector)
-end
-
-
-
-function read_solution(; io::IO)
-    data_matrix = readdlm(data; comments=true)
-
-    return data_matrix
-end
-
-function ConvertConfig(log_matrix::Matrix)
-    x_left, x_right, N, dx, finish_time, M, dt = log_matrix'
-
-    return (
-        x_left=x_left,
-        x_right=x_right,
-        N=trunc(Int, N),
-        dx=dx,
-        finish_time=finish_time,
-        M=trunc(Int, M),
-        dt=dt,
-    )
 end
 
 function parse_num(str::AbstractString)

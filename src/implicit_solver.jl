@@ -66,6 +66,37 @@ function calc_coeff!(solver::ImplicitSolver, problem::HeatWaveProblem; dt)
     return nothing
 end
 
+function forward_back!(solver::ImplicitSolver)
+    N = solver.N
+
+    k = solver.matrix[1, 1]
+    solver.u_prev[1] /= k
+    solver.matrix[1, 1] /= k
+    solver.matrix[1, 2] /= k
+    for i in 2:N-1
+        k = solver.matrix[i, i-1]
+        solver.u_prev[i] -= k * solver.u_prev[i-1]
+        solver.matrix[i, i-1] -= k * solver.matrix[i-1, i-1]
+        solver.matrix[i, i] -= k * solver.matrix[i-1, i]
+
+        k = solver.matrix[i, i]
+        solver.u_prev[i] /= k
+        solver.matrix[i, i] /= k
+        solver.matrix[i, i+1] /= k
+    end
+    k = solver.matrix[N, N]
+    solver.u_prev[N] /= k
+    solver.matrix[N, N] /= k
+
+    for i in N-1:-1:1
+        k = solver.matrix[i, i+1]
+        solver.u_prev[i] -= k * solver.u_prev[i+1]
+        solver.matrix[i, i+1] -= k * solver.matrix[i+1, i+1]
+    end
+
+    solver.u_curr .= solver.u_prev
+end
+
 function step!(solver::ImplicitSolver, problem::HeatWaveProblem; iter::Int, dt)
     solver.u_prev .= solver.u_curr
     time = (iter - 1) * dt
@@ -73,7 +104,8 @@ function step!(solver::ImplicitSolver, problem::HeatWaveProblem; iter::Int, dt)
     solver.u_prev[end] = problem.u_right(time)
 
     calc_coeff!(solver, problem; dt=dt)
-    solver.u_curr .= solver.matrix \ solver.u_prev  # Write/find more optimal way
+    solver.u_curr .= solver.matrix \ solver.u_prev
+    # forward_back!(solver)
 
     return nothing
 end

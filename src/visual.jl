@@ -8,34 +8,34 @@ end
 
 """
     function draw_frame(
-        t::Int;
-        folder::AbstractString="output",
-        is_save::Bool=false,
-        lw::Real=1.5
+        t::Int[;
+        io::IO=stdout,
+        lw::Real=1.0,
+        sw::Real=0.5,
+        fn::Union{Function, Nothing}=nothing,]
     )
 
-Visual function `u` on the `t` time layer. Get data from `folder`. Save to `folder`.
+Visual function `u` on the `t` time layer. Get data from `io`.
 
 # Arguments
+
 - `t::Int`: number of time layer
 
 # Keywords
-- `folder::AbstractString="output"`: folder with data to plot
-- `is_save::Bool=false`: flag for saving plot picture (to the `folder`)
+
+- `io::IO=stdout`: IO stream with data to plot
 - `lw::Real=1.0`: width of the line plot
 - `sw::Real=0.5`: width of the scatter plot
 - `fn::Union{Function, Nothing}=nothing`: function of analytical solution
 
 # Throws
-- `Time out of range!`: if number `t` is greater than total number of time layers
 
-# Returns
-- `nothing`: return in case of successful ploting
+- `Time out of range!`: if number `t` is greater than total number of time layers
 """
 function draw_frame(
     t::Int;
     io::IO=stdout,
-    is_save::Bool=false,
+    #is_save::Bool=false,
     lw::Real=1.0,
     sw::Real=0.5,
     fn::Union{Function, Nothing}=nothing,
@@ -66,45 +66,44 @@ function draw_frame(
     )
 
     display(pl)
+    #=
     if is_save
         savefig(pl, folder)
     end
-
+    =#
     return nothing
 end;
 
 """
     function draw_series(
-        series::Vector{Int};
-        folder::AbstractString="output",
-        is_save::Bool=false,
-        seriestype::Symbol=:scatter,
-        lw::Real=1.5,
+        series::Union{AbstractVector{Int}, AbstractRange{Int}};
+        io::IO=stdout,
+        lw::Real=1.0,
+        sw::Real=0.5,
+        fn::Union{Function, Nothing}=nothing,
     )
 
-Visual function `u` on the time layers from `series`. Get data from `folder`.
-    Save to `folder`.
+Visual function `u` on the time layers from `series`. Get data from `io`.
 
 # Arguments
+
 - `series::Vector{Int}`: vector with number of time layers
 
 # Keywords
-- `folder::AbstractString="output"`: folder with data to plot
-- `is_save::Bool=false`: flag for saving plot picture (to the `folder`)
-- `seriestype::Symbol=:scatter`: symbol for data visualisation
-    (make sence only with `:scatter` and `:line`)
-- `lw::Real=1.5`: width of symbols
+
+- `io::IO=stdout`: IO stream with data to plot
+- `lw::Real=1.0`: width of the line plot
+- `sw::Real=0.5`: width of the scatter plot
+- `fn::Union{Function, Nothing}=nothing`: function of analytical solution
 
 # Throws
-- `Time out of range!`: if any numbers `t` is greater than total number of time layers
 
-# Returns
-- `nothing`: return in case of successful ploting
+- `Time out of range!`: if any numbers `t` is greater than total number of time layers
 """
 function draw_series(
     series::Union{AbstractVector{Int}, AbstractRange{Int}};
     io::IO=stdout,
-    is_save::Bool=false,
+    #is_save::Bool=false,
     lw::Real=1.0,
     sw::Real=0.5,
     fn::Union{Function, Nothing}=nothing,
@@ -134,9 +133,10 @@ function draw_series(
     end
 
     display(pl)
+    #=
     if is_save
         savefig(pl, folder)
     end
-
+    =#
     return nothing
 end
